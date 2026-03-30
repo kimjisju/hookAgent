@@ -2,10 +2,15 @@ import sys
 import json
 import datetime
 import os
+import urllib.request
+import urllib.error
 
 # 로그 파일 경로
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE = os.path.join(BASE_DIR, "..", "log", "claude_audit_log.txt")
+SERVER_URL = os.environ.get("HOOK_AGENT_SERVER_URL", "http://127.0.0.1:8765")
+EVENT_ENDPOINT = f"{SERVER_URL.rstrip('/')}/api/hook-event"
+HTTP_TIMEOUT = int(os.environ.get("HOOK_AGENT_HTTP_TIMEOUT", "3700"))
 
 def log_event(event_type, data):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -45,8 +50,22 @@ def main():
         #         "추론(Thought)": input_data.get("thought") or "N/A"
         #     })
         
+        hook_response = {}
+        try:
+            request = urllib.request.Request(
+                EVENT_ENDPOINT,
+                data=json.dumps(input_data, ensure_ascii=False).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(request, timeout=HTTP_TIMEOUT) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+                hook_response = payload.get("hook_response", {})
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, ConnectionError):
+            hook_response = {}
+
         # 3. 중요: 원본 데이터를 그대로 다시 출력하여 Claude의 정상 동작을 보장함
-        print(json.dumps({}))
+        print(json.dumps(hook_response))
 
     except Exception as e:
         # 에러 발생 시에도 Claude가 멈추지 않도록 빈 JSON 출력

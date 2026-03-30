@@ -1,5 +1,9 @@
 # hookAgent
 
+<!-- ![Preview](docs/img/Preview.png) -->
+
+<img src="docs/img/Preview.png", height="200x">
+
 HookAgent는 AI Agent의 사용자 입력, 추론, 도구 사용을 가로채고 감시하여 나쁜 행동을 탐지하고 제한합니다.
 
 ## 탐지 과정
@@ -12,11 +16,12 @@ HookAgent는 AI Agent의 사용자 입력, 추론, 도구 사용을 가로채고
 ## 사용 방법
 
 ```bash
-echo "Not Exist Yet"
+python3 app.py
 ```
 
 ## 문서 목록
 
 - [프로젝트 개요](docs/project-overview.md)
 - [현재 구현](docs/current-implementation.md)
+- [컨트롤 패널](docs/control-panel.md)
 - [로드맵](docs/roadmap.md)
