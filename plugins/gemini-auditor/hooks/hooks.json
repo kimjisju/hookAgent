@@ -1,0 +1,127 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${extensionPath}${/}..${/}..${/}scripts${/}gemini_auditor.py\"",
+            "name": "hookagent-session-start"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${extensionPath}${/}..${/}..${/}scripts${/}gemini_auditor.py\"",
+            "name": "hookagent-session-end"
+          }
+        ]
+      }
+    ],
+    "BeforeAgent": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${extensionPath}${/}..${/}..${/}scripts${/}gemini_auditor.py\"",
+            "name": "hookagent-before-agent"
+          }
+        ]
+      }
+    ],
+    "AfterAgent": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${extensionPath}${/}..${/}..${/}scripts${/}gemini_auditor.py\"",
+            "name": "hookagent-after-agent"
+          }
+        ]
+      }
+    ],
+    "BeforeTool": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${extensionPath}${/}..${/}..${/}scripts${/}gemini_auditor.py\"",
+            "name": "hookagent-before-tool"
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${extensionPath}${/}..${/}..${/}scripts${/}gemini_auditor.py\"",
+            "name": "hookagent-after-tool"
+          }
+        ]
+      }
+    ],
+    "BeforeModel": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${extensionPath}${/}..${/}..${/}scripts${/}gemini_auditor.py\"",
+            "name": "hookagent-before-model"
+          }
+        ]
+      }
+    ],
+    "AfterModel": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${extensionPath}${/}..${/}..${/}scripts${/}gemini_auditor.py\"",
+            "name": "hookagent-after-model"
+          }
+        ]
+      }
+    ],
+    "BeforeToolSelection": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${extensionPath}${/}..${/}..${/}scripts${/}gemini_auditor.py\"",
+            "name": "hookagent-before-tool-selection"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${extensionPath}${/}..${/}..${/}scripts${/}gemini_auditor.py\"",
+            "name": "hookagent-notification"
+          }
+        ]
+      }
+    ],
+    "PreCompress": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${extensionPath}${/}..${/}..${/}scripts${/}gemini_auditor.py\"",
+            "name": "hookagent-pre-compress"
+          }
+        ]
+      }
+    ]
+  }
+}

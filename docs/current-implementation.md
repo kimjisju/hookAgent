@@ -5,9 +5,10 @@
 현재 프로젝트는 다음 범위까지 구현되어 있습니다.
 
 - Claude Code에서 사용자 입력과 도구 사용을 추적
+- gemini-cli에서 주요 훅 이벤트와 도구 사용을 추적
 - 프록시 서버(`mitmproxy`)를 통해 외부와의 통신 과정, 특히 LLM과의 통신 과정을 추적
-- 로컬 컨트롤 서버와 웹 GUI를 통해 Claude 훅 이벤트를 실시간으로 추적
-- `PreToolUse` 이벤트에서 사용자의 `Yes`/`No` 판단으로 도구 사용을 제어
+- 로컬 컨트롤 서버와 웹 GUI를 통해 Claude / Gemini 훅 이벤트를 실시간으로 추적
+- Claude의 `PreToolUse`, Gemini의 `BeforeTool` 이벤트에서 사용자의 `Yes`/`No` 판단으로 도구 사용을 제어
 
 ## 1. Claude Code에서 사용자 입력과 도구 사용을 추적하는 방법
 
@@ -41,6 +42,37 @@ claude --plugin-dir ./plugins/auditor
 
 - `log/hook_agent_events.jsonl`
 - `log/hook_agent_approvals.jsonl`
+
+## 1-2. gemini-cli에서 사용자 입력과 도구 사용을 추적하는 방법
+
+gemini-cli는 extension 형식으로 지원합니다. 확장 루트는 `plugins/gemini-auditor`이며,
+Gemini CLI의 `gemini-extension.json` 및 `hooks/hooks.json` 규약을 따릅니다.
+
+훅 설정은 `plugins/gemini-auditor/hooks/hooks.json`에 있으며, 다음 주요 이벤트를
+`scripts/gemini_auditor.py`로 전달합니다.
+
+- `SessionStart`
+- `SessionEnd`
+- `BeforeAgent`
+- `AfterAgent`
+- `BeforeTool`
+- `AfterTool`
+- `BeforeModel`
+- `AfterModel`
+- `BeforeToolSelection`
+- `Notification`
+- `PreCompress`
+
+`scripts/gemini_auditor.py`는 Gemini 훅 입력을 그대로 기록하고, 로컬 컨트롤 서버로
+구조화 이벤트를 전달합니다. `BeforeTool` 이벤트에서는 서버의 승인 결과를 받아
+Gemini 훅 응답 형식인 `decision` / `reason`으로 다시 반환합니다.
+
+로컬에서 개발 중인 extension은 다음처럼 연결할 수 있습니다.
+
+```bash
+gemini extensions link ./plugins/gemini-auditor
+python3 app.py --agent gemini
+```
 
 ## 2. 외부와의 통신 과정을 추적하는 방법
 

@@ -11,6 +11,18 @@ LOG_FILE = os.path.join(BASE_DIR, "..", "log", "claude_audit_log.txt")
 SERVER_URL = os.environ.get("HOOK_AGENT_SERVER_URL", "http://127.0.0.1:8765")
 EVENT_ENDPOINT = f"{SERVER_URL.rstrip('/')}/api/hook-event"
 HTTP_TIMEOUT = int(os.environ.get("HOOK_AGENT_HTTP_TIMEOUT", "3700"))
+AGENT_NAME = "claude-code"
+
+
+def ensure_log_dir() -> None:
+    os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+
+
+def read_hook_input():
+    raw = sys.stdin.buffer.read()
+    if not raw:
+        return {}
+    return json.loads(raw.decode("utf-8", errors="surrogatepass"))
 
 def log_event(event_type, data):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -21,9 +33,11 @@ def log_event(event_type, data):
 
 def main():
     try:
+        ensure_log_dir()
         # 1. Claude로부터 JSON 데이터 읽기
-        input_data = json.load(sys.stdin)
+        input_data = read_hook_input()
         event_name = input_data.get("hook_event_name")
+        input_data["agent_name"] = AGENT_NAME
         
         # RAW 데이터 기록 (항상 최상단에 기록)
         with open(LOG_FILE, "a", encoding="utf-8") as f:
@@ -65,11 +79,11 @@ def main():
             hook_response = {}
 
         # 3. 중요: 원본 데이터를 그대로 다시 출력하여 Claude의 정상 동작을 보장함
-        print(json.dumps(hook_response))
+        print(json.dumps(hook_response, ensure_ascii=False))
 
     except Exception as e:
         # 에러 발생 시에도 Claude가 멈추지 않도록 빈 JSON 출력
-        print(json.dumps({}))
+        print(json.dumps({}, ensure_ascii=False))
 
 if __name__ == "__main__":
     main()
