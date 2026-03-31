@@ -49,6 +49,7 @@ class EventStore:
                 "session_id": session_id,
                 "created_at": utc_now_iso(),
                 "updated_at": utc_now_iso(),
+                "agent_name": "",
                 "cwd": "",
                 "permission_mode": "",
                 "status": "active",
@@ -84,6 +85,7 @@ class EventStore:
                 "id": self._next_event_id(),
                 "timestamp": utc_now_iso(),
                 "session_id": session_id,
+                "agent_name": payload.get("agent_name", ""),
                 "hook_event_name": payload.get("hook_event_name", "Unknown"),
                 "cwd": payload.get("cwd", ""),
                 "permission_mode": payload.get("permission_mode", ""),
@@ -93,8 +95,11 @@ class EventStore:
             }
             session = self._session_record(session_id)
             session["updated_at"] = event["timestamp"]
+            session["agent_name"] = payload.get("agent_name", session["agent_name"])
             session["cwd"] = payload.get("cwd", session["cwd"])
             session["permission_mode"] = payload.get("permission_mode", session["permission_mode"])
+            if event["hook_event_name"] in {"UserPromptSubmit", "BeforeAgent", "PreToolUse", "BeforeTool"}:
+                session["status"] = "active"
             if event["hook_event_name"] == "Stop":
                 session["status"] = "stopped"
                 session["summary"] = payload.get("last_assistant_message", "")
@@ -104,6 +109,10 @@ class EventStore:
                 session["summary"] = payload.get("message", session["summary"])
             elif event["hook_event_name"] == "UserPromptSubmit":
                 session["summary"] = payload.get("prompt", session["summary"])
+            elif event["hook_event_name"] == "BeforeAgent":
+                session["summary"] = payload.get("prompt", session["summary"])
+            elif event["hook_event_name"] == "AfterAgent":
+                session["status"] = "idle"
             session["events"].append(event)
             self.event_history.append(event)
             self._append_jsonl(self.events_file, event)
@@ -117,6 +126,7 @@ class EventStore:
             approval = {
                 "approval_id": approval_id,
                 "session_id": event["session_id"],
+                "agent_name": event.get("agent_name", ""),
                 "event_id": event["id"],
                 "tool_name": event.get("tool_name"),
                 "tool_use_id": event.get("tool_use_id"),
@@ -174,6 +184,10 @@ class EventStore:
                     approval["status"] = "denied"
                     approval["reason"] = "Approval timed out."
                     approval["decided_at"] = utc_now_iso()
+                    session = self._session_record(approval["session_id"])
+                    session["pending_approvals"] = [
+                        item for item in session["pending_approvals"] if item != approval_id
+                    ]
                     self._append_jsonl(self.approvals_file, approval)
                     self._broadcast({"type": "approval_updated", "data": approval})
                     return {"status": "denied", "reason": approval["reason"]}
@@ -189,6 +203,7 @@ class EventStore:
                         "session_id": session["session_id"],
                         "created_at": session["created_at"],
                         "updated_at": session["updated_at"],
+                        "agent_name": session["agent_name"],
                         "cwd": session["cwd"],
                         "permission_mode": session["permission_mode"],
                         "status": session["status"],

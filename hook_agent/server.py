@@ -19,6 +19,7 @@ SERVER_HOST = os.environ.get("HOOK_AGENT_HOST", "127.0.0.1")
 SERVER_PORT = int(os.environ.get("HOOK_AGENT_PORT", "8765"))
 APPROVAL_TIMEOUT_SECONDS = int(os.environ.get("HOOK_AGENT_APPROVAL_TIMEOUT", "3600"))
 REQUIRE_APPROVAL = os.environ.get("HOOK_AGENT_REQUIRE_APPROVAL", "1") != "0"
+APPROVAL_HOOK_EVENTS = {"PreToolUse", "BeforeTool"}
 
 STORE = EventStore(LOG_DIR)
 
@@ -109,29 +110,40 @@ class HookAgentHandler(BaseHTTPRequestHandler):
     def _handle_hook_event(self) -> None:
         payload = self._read_json_body()
         event = STORE.add_event(payload)
-        if event["hook_event_name"] != "PreToolUse" or not REQUIRE_APPROVAL:
+        if event["hook_event_name"] not in APPROVAL_HOOK_EVENTS or not REQUIRE_APPROVAL:
             json_response(self, {"hook_response": {}})
             return
 
         approval = STORE.create_approval(event)
         decision = STORE.wait_for_approval(approval["approval_id"], APPROVAL_TIMEOUT_SECONDS)
-        if decision["status"] == "approved":
-            hook_response = {
-                "hookSpecificOutput": {
-                    "hookEventName": "PreToolUse",
-                    "permissionDecision": "allow",
-                    "permissionDecisionReason": decision["reason"] or "Approved from hookAgent GUI.",
-                }
-            }
-        else:
-            hook_response = {
-                "hookSpecificOutput": {
-                    "hookEventName": "PreToolUse",
-                    "permissionDecision": "deny",
-                    "permissionDecisionReason": decision["reason"] or "Denied from hookAgent GUI.",
-                }
-            }
+        hook_response = self._build_hook_response(payload, decision)
         json_response(self, {"hook_response": hook_response, "approval_id": approval["approval_id"]})
+
+    def _build_hook_response(self, payload: dict[str, Any], decision: dict[str, str]) -> dict[str, Any]:
+        hook_event_name = payload.get("hook_event_name", "")
+        agent_name = payload.get("agent_name", "")
+        is_approved = decision["status"] == "approved"
+        default_reason = "Approved from hookAgent GUI." if is_approved else "Denied from hookAgent GUI."
+        reason = decision["reason"] or default_reason
+
+        if hook_event_name == "BeforeTool" or agent_name == "gemini-cli":
+            if is_approved:
+                return {"decision": "allow", "reason": reason}
+            return {
+                "decision": "block",
+                "reason": reason,
+            }
+
+        if hook_event_name == "PreToolUse":
+            return {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "allow" if is_approved else "deny",
+                    "permissionDecisionReason": reason,
+                }
+            }
+
+        return {}
 
     def _handle_approval_decision(self, approval_id: str) -> None:
         payload = self._read_json_body()

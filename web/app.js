@@ -75,6 +75,7 @@ function renderSessions() {
     card.innerHTML = `
       <h3>${session.summary || session.session_id}</h3>
       <div class="meta-row">
+        <span class="pill">${session.agent_name || "unknown agent"}</span>
         <span class="pill">${session.status}</span>
         <span class="pill">${session.permission_mode || "unknown"}</span>
         <span class="pill">events ${session.event_count}</span>
@@ -135,7 +136,13 @@ function summarizeEvent(event) {
     return raw.prompt || "";
   }
   if (event.hook_event_name === "Notification") {
-    return raw.message || "";
+    return formatJson({
+      message: raw.message,
+      notification_type: raw.notification_type,
+      tool_name: raw.tool_name,
+      tool_input: raw.tool_input,
+      details: raw.details,
+    });
   }
   if (event.hook_event_name === "Stop") {
     return raw.last_assistant_message || "";
@@ -159,7 +166,7 @@ function renderTimeline() {
     return;
   }
   elements.sessionTitle.textContent = detail.summary || detail.session_id;
-  elements.sessionMeta.textContent = `${detail.cwd || "cwd 없음"} · ${detail.permission_mode || "mode 없음"} · ${detail.status}`;
+  elements.sessionMeta.textContent = `${detail.agent_name || "unknown agent"} · ${detail.cwd || "cwd 없음"} · ${detail.permission_mode || "mode 없음"} · ${detail.status}`;
   if (!detail.events.length) {
     elements.timeline.className = "timeline empty";
     elements.timeline.textContent = "아직 표시할 이벤트가 없습니다.";
@@ -175,11 +182,22 @@ function renderTimeline() {
         <span class="kind">${event.hook_event_name}</span>
         <span class="pill">${formatTime(event.timestamp)}</span>
       </header>
-      <p class="muted">${event.tool_name || "session event"}</p>
+      <p class="muted">${event.tool_name || rawToolName(event) || "session event"}</p>
       <pre>${summarizeEvent(event)}</pre>
     `;
     elements.timeline.appendChild(item);
   }
+}
+
+function rawToolName(event) {
+  const raw = event.raw || {};
+  if (typeof raw.tool_name === "string" && raw.tool_name) {
+    return raw.tool_name;
+  }
+  if (raw.details && typeof raw.details.title === "string") {
+    return raw.details.title;
+  }
+  return "";
 }
 
 async function submitDecision(approvalId, status) {

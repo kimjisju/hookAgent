@@ -1,0 +1,64 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"./scripts/codex_auditor.py\"",
+            "statusMessage": "hookAgent codex session-start"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"./scripts/codex_auditor.py\"",
+            "statusMessage": "hookAgent codex user-prompt-submit"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"./scripts/codex_auditor.py\"",
+            "statusMessage": "hookAgent codex pre-tool-use"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"./scripts/codex_auditor.py\"",
+            "statusMessage": "hookAgent codex post-tool-use"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"./scripts/codex_auditor.py\"",
+            "statusMessage": "hookAgent codex stop"
+          }
+        ]
+      }
+    ]
+  }
+}

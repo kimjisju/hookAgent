@@ -1,0 +1,5 @@
+{
+  "name": "gemini-auditor",
+  "version": "1.0.0",
+  "description": "Send Gemini CLI hook events to hookAgent."
+}

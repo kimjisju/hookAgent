@@ -1,12 +1,12 @@
 {
 "hooks": {
-    "SessionStart": [{"matcher": "*", "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
-    "SessionEnd": [{"matcher": "*", "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
-    "UserPromptSubmit": [{"matcher": "*", "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
-    "PreToolUse": [{"matcher": "*", "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
-    "PostToolUse": [{"matcher": "*", "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
-    "Stop": [{"matcher": "*", "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
-    "SubagentStop": [{"matcher": "*", "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
-    "PreCompact": [{"matcher": "*", "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
-    "Notification": [{"matcher": "*", "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}]
+    "SessionStart": [{"matcher": "*", "hooks": [{"type": "command", "command": "python \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
+    "SessionEnd": [{"matcher": "*", "hooks": [{"type": "command", "command": "python \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
+    "UserPromptSubmit": [{"matcher": "*", "hooks": [{"type": "command", "command": "python \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
+    "PreToolUse": [{"matcher": "*", "hooks": [{"type": "command", "command": "python \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
+    "PostToolUse": [{"matcher": "*", "hooks": [{"type": "command", "command": "python \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
+    "Stop": [{"matcher": "*", "hooks": [{"type": "command", "command": "python \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
+    "SubagentStop": [{"matcher": "*", "hooks": [{"type": "command", "command": "python \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
+    "PreCompact": [{"matcher": "*", "hooks": [{"type": "command", "command": "python \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}],
+    "Notification": [{"matcher": "*", "hooks": [{"type": "command", "command": "python \"${CLAUDE_PLUGIN_ROOT}/../../scripts/auditor.py\""}]}]
 }}
